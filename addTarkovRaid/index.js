@@ -5,22 +5,33 @@ var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 exports.handler = (event, context, callback) => {
     console.log(JSON.stringify(event, null, '  '));
     var tableName = "dagodz_tarkov";    
-    var payload = event.responsePayload
+    var payload = event.responsePayload;
+    var myItem = {
+            "raidId": {S: context.awsRequestId}, //mandatory
+            "timestamp": {S: payload.timestamp}, //mandatory
+            "user": {S: payload.user}, //mandatory
+            "playerType": {S: payload.playerType}, //mandatory
+            "outcome": {S: payload.outcome}, //mandatory
+            "duration": {N: payload.duration} //mandatory
+        };
+        
+    if (payload.xp) {
+        myItem.xp = {N: payload.xp};
+    }
+    
+    if (payload.deathLocation) {
+        myItem.deathLocation = {S: payload.deathLocation};
+    }
+    
+    if (payload.currentLevel) {
+        myItem.currentLevel = {N: payload.currentLevel};
+    }
+
     dynamodb.putItem({
         "TableName": tableName,
-        "Item" : {
-            "raidId": {S: context.awsRequestId},
-            "timestamp": {S: payload.timestamp},
-            "user": {S: payload.user},
-            "playerType": {S: payload.playerType},
-            "outcome": {S: payload.outcome},
-            "duration": {N: payload.duration},
-            "xp": {N: payload.xp},
-            "deathLocation": {S: payload.deathLocation},
-            "currentLevel": {N: payload.currentLevel}
-            
+        "Item" : myItem
         }
-    }, function(err, data) {
+    , function(err, data) {
         if (err) {
             console.log('Error putting item into dynamodb failed: '+err);
             context.done('error');
