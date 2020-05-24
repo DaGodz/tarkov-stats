@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  parseTextractJson:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: parseTextractJson
+      Description: ''
+      Handler: index.handler
+      MemorySize: 128
+      Role: >-
+        arn:aws:iam::832044451952:role/service-role/parseTextractJson-role-b86fpv7z
+      Runtime: nodejs12.x
+      Timeout: 3
