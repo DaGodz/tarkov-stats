@@ -13,16 +13,20 @@ var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 exports.handler = (event, context, callback) => {
   var params = {
   TableName: 'dagodz_tarkov',
-  Key: {
-    'raidId': {S: event.raidId}
-  }
+  // Key: {
+  //   'raidId': {S: event.raidId}
+  // }
   //ProjectionExpression: 'outcome'
 };
-  ddb.getItem(params, function(err, data) {
+  ddb.scan(params, function(err, data) {
     if (err) {
       console.log("Error", err);
     } else {
-      console.log("Success", data.Item);
+      var response = [];
+      data.Items.forEach (function(item) {
+          response.push(AWS.DynamoDB.Converter.unmarshall(item)); // convert dynamoDB madness into normal JSON
+      })
+      return response;
     }
-  });
+  })
 };
