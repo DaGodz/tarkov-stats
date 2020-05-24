@@ -1,37 +1,60 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-
-Description: SAM application for collecting EFT Raid statistics from screenshots of the Raid End screen.
-
+Description: >-
+  SAM application for collecting EFT Raid statistics from screenshots of the
+  Raid End screen.
 Resources:
-    SourceImageBucket:
-        Type: 'AWS::S3::Bucket'
-        Properties:
-            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-source-images"
-            
-    InvokeTextract:
-        Type: 'AWS::Serverless::Function'
-        Properties:
-            Handler: InvokeTextract/src/app.lambda_handler
-            Runtime: python3.6
-            CodeUri: .
-            Description: Invokes Textract service for S3 Objects.
-            MemorySize: 256
-            Timeout: 30
-            Policies:
-                - Version: '2012-10-17'
-                  Statement:
-                    - Effect: Allow
-                      Action: s3:GetObject
-                      # Building the resource name the same as the BucketName above to avoid circular dependancies
-                      # See: https://github.com/awslabs/serverless-application-model/issues/138
-                      Resource: !Sub "arn:aws:s3:::${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-source-images*"
-                    - Effect: Allow
-                      Action: textract:StartDocumentTextDetection
-                      Resource: '*'
-            Events:
-                CreateScreenshotEvent:
-                    Type: S3
-                    Properties:
-                        Bucket: !Ref SourceImageBucket
-                        Events: s3:ObjectCreated:*
+  SourceImageBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName:
+        'Fn::Sub': '${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-source-images'
+  InvokeTextract:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: InvokeTextract/src/app.lambda_handler
+      Runtime: python3.6
+      CodeUri: .
+      Description: Invokes Textract service for S3 Objects.
+      MemorySize: 256
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 's3:GetObject'
+              Resource:
+                'Fn::Sub': >-
+                  arn:aws:s3:::${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-source-images*
+            - Effect: Allow
+              Action: 'textract:StartDocumentTextDetection'
+              Resource: '*'
+      Events:
+        CreateScreenshotEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: SourceImageBucket
+            Events: 's3:ObjectCreated:*'
+      
+  addTarkovRaid:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: addTarkovRaid
+      Description: ''
+      Handler: index.handler
+      MemorySize: 128
+      Role: 'arn:aws:iam::832044451952:role/service-role/addTarkovRaid-role-aqpnl5na'
+      Runtime: nodejs12.x
+      Timeout: 3
+      
+  getTarkovRaid:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: getTarkovRaid
+      Description: ''
+      Handler: index.handler
+      MemorySize: 128
+      Role: 'arn:aws:iam::832044451952:role/service-role/getTarkovRaid-role-524xegau'
+      Runtime: nodejs12.x
+      Timeout: 3
