@@ -7,26 +7,24 @@ AWS.config.update({region: 'eu-west-1'});
 // Create the DynamoDB service object
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
-
-
-// Call DynamoDB to read the item from the table
 exports.handler = (event, context, callback) => {
   var params = {
-  TableName: 'dagodz_tarkov',
-  // Key: {
-  //   'raidId': {S: event.raidId}
-  // }
-  //ProjectionExpression: 'outcome'
+  TableName: 'dagodz_tarkov'
 };
-  ddb.scan(params, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      var response = [];
-      data.Items.forEach (function(item) {
-          response.push(AWS.DynamoDB.Converter.unmarshall(item)); // convert dynamoDB madness into normal JSON
+
+  function getData() {
+    return new Promise((resolve, reject) => {
+      ddb.scan(params, function(err, data) {
+        var response = [];
+        if (err) reject (err);
+        data.Items.forEach (function(item){
+          response.push(AWS.DynamoDB.Converter.unmarshall(item));
+        })
+        resolve(response);
       })
-      return response;
-    }
-  })
+    })
+  }
+  
+return getData();
+  
 };
