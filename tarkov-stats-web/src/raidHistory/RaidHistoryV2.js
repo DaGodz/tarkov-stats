@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Raid from './components/Raid';
 import Pagination from './components/Pagination';
 import axios from 'axios';
+import aws4 from 'aws4';
+
 
 
 const RaidHistoryV2 = () => {
@@ -13,7 +15,29 @@ const RaidHistoryV2 = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
+            
+            let request = {
+                host: 'https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids',
+                method: 'GET',
+                url: 'https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids',
+                path: '/prod/GetAllRaids'
+            }
+            
+            let signedRequest = aws4.sign(request,
+            {
+                secretAccessKey: AWS.config.credentials.secretAccessKey,
+                accessKeyId: AWS.config.credentials.accessKeyId,
+                sessionToken: AWS.config.credentials.sessionToken
+            })
+            
+            delete signedRequest.headers['Host']
+            delete signedRequest.headers['Content-Length']
+            
+            let response = await axios(signedRequest)
+        
+            
+            const res = await axios.get('https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids');
+            //const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
             setData(res.data);
             setLoading(false);
         };
