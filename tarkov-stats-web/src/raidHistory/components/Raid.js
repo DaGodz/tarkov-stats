@@ -8,8 +8,8 @@ const Raid = ({ raids, loading }) => {
     return (
         <ul className='list-group mb-4'>
             {raids.map(raid => (
-                <li key={raid.id} className='list-group-item'>
-                    {raid.title}
+                <li key={raid.raidId} className='list-group-item'>
+                    {raid.user} {raid.outcome}
                 </li>
             ))}
         </ul>

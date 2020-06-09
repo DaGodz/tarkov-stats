@@ -18,25 +18,25 @@ const RaidHistoryV2 = () => {
             
             let request = {
                 host: 'https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids',
-                method: 'GET',
+                method: 'POST',
                 url: 'https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids',
                 path: '/prod/GetAllRaids'
             }
             
             let signedRequest = aws4.sign(request,
             {
-                secretAccessKey: AWS.config.credentials.secretAccessKey,
-                accessKeyId: AWS.config.credentials.accessKeyId,
-                sessionToken: AWS.config.credentials.sessionToken
+                //secretAccessKey: AWS.config.credentials.secretAccessKey,
+               // accessKeyId: AWS.config.credentials.accessKeyId,
+               //sessionToken: AWS.config.credentials.sessionToken
             })
             
             delete signedRequest.headers['Host']
             delete signedRequest.headers['Content-Length']
             
-            let response = await axios(signedRequest)
+            //let response = await axios(signedRequest)
         
-            
-            const res = await axios.get('https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids');
+            //axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+            const res = await axios.post('https://8l6lu4s1zi.execute-api.eu-west-1.amazonaws.com/prod/GetAllRaids');
             //const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
             setData(res.data);
             setLoading(false);
